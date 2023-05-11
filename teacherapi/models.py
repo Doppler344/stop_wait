@@ -4,7 +4,14 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
-class Student(models.Model):
+class BaseModel(models.Model):
+    objects = models.Manager()
+
+    class Meta:
+        abstract = True
+
+
+class Student(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -16,7 +23,7 @@ class Student(models.Model):
         return f'{self.first_name} {self.last_name} {self.middle_name} {self.education_group} {self.year_of_university}'
 
 
-class Teacher(models.Model):
+class Teacher(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -29,7 +36,7 @@ class Teacher(models.Model):
         return f'{self.first_name} {self.last_name} {self.middle_name} {self.grade} {self.department} {self.faculty}'
 
 
-class Category(models.Model):
+class Category(BaseModel):
     student = models.ManyToManyField(Student)
     NAME_CHOICES = (
         ('Экзамен', 'Экзамен'), ('Курсовая', 'Курсовая'), ('Лабораторная', 'Лабораторная'), ('Дипломная', 'Дипломная'),
@@ -40,7 +47,7 @@ class Category(models.Model):
         return f'{self.pk} {self.name}'
 
 
-class Subscription(models.Model):
+class Subscription(BaseModel):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
@@ -48,7 +55,7 @@ class Subscription(models.Model):
         return f'{self.teacher} {self.student}'
 
 
-class Visit(models.Model):
+class Visit(BaseModel):
     datetime = models.DateTimeField()
     office = models.CharField(max_length=30)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
@@ -57,7 +64,7 @@ class Visit(models.Model):
         return f'{self.teacher} {self.office} {self.datetime}'
 
 
-class Queue(models.Model):
+class Queue(BaseModel):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     visit = models.ForeignKey(Visit, on_delete=models.CASCADE)
     number = models.PositiveSmallIntegerField()

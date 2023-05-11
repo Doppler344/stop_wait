@@ -16,16 +16,27 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from rest_framework.authtoken.views import obtain_auth_token
+
 from teacherapi import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
+router.register(r'students', views.StudentViewSet)
+router.register(r'teachers', views.TeacherViewSet)
+router.register(r'categorys', views.CategoryViewSet)
+router.register(r'subscriptions', views.SubscriptionViewSet)
+router.register(r'visits', views.VisitViewSet)
+router.register(r'queues', views.QueueViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('api/get-in-visit/', views.GetInVisit.as_view()),
+    path('api/create-user/', views.CreateUser.as_view()),
+    path('api/token/', obtain_auth_token),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
 ]
