@@ -34,6 +34,7 @@ router.register(r'queues', views.QueueViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('api/update-queue-status/', views.UpdateQueueStatus.as_view()),
     path('api/get-in-visit/', views.GetInVisit.as_view()),
     path('api/create-user/', views.CreateUser.as_view()),
     path('api/token/', obtain_auth_token),

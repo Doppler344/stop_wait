@@ -59,6 +59,7 @@ class Visit(BaseModel):
     datetime = models.DateTimeField()
     office = models.CharField(max_length=30)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    category = models.ManyToManyField(Category, blank=True)  # Возможно не должно быть пустым
 
     def __str__(self):
         return f'{self.teacher} {self.office} {self.datetime}'

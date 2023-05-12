@@ -17,6 +17,17 @@ from teacherapi.models import Student, Teacher, Category, Subscription, Visit, Q
 from teacherapi.validation import validate_username
 
 
+class UpdateQueueStatus(views.APIView):
+    """Обновить свой статус в очереди"""
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+
+    def post(self, request: Request):
+        content = {'message': request.user.username,
+                   'data': request.data}
+        return Response(content)
+
+
 class GetInVisit(views.APIView):
     """Записаться на прием"""
     permission_classes = (permissions.IsAuthenticated,)
@@ -34,7 +45,7 @@ class GetInVisit(views.APIView):
         if queue.exists():
             content = {'message': 'Вы уже в очереди',  # вернем список, вдруг произошла смена места в очереди
                        'data': [{'number': el.number, 'status': el.status, 'username': user.username,
-                                'student': str(student)} for el in queue]}
+                                 'student': str(student)} for el in queue]}
             return Response(content)
 
         # Узнаем номер последнего в очереди
@@ -94,30 +105,45 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 class StudentViewSet(viewsets.ModelViewSet):
+    # Должен быть доступен студенту для
+    # - создания своего профиля
+    # - изменения только своего профиля
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
 
 
 class TeacherViewSet(viewsets.ModelViewSet):
+    # Должен быть доступен преподавателю для
+    # - создания своего профиля
+    # - изменения только своего профиля
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    # Должен быть доступен студенту для
+    # - создания своих категорий
+    # - изменения своих категорий
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
+    # Должен быть доступен студенту для
+    # - создания своих подписок
+    # - изменения своих подписок
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
 
 
 class VisitViewSet(viewsets.ModelViewSet):
+    # Должен быть доступен преподавателю для
+    # - создания своих мероприятий
+    # - изменения своих мероприятий
     queryset = Visit.objects.all()
     serializer_class = VisitSerializer
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
