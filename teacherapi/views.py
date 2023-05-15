@@ -18,6 +18,7 @@ from teacherapi.validation import validate_username
 
 
 class UpdateQueueStatus(views.APIView):
+    # Эта штука же есть уже в rest
     """Обновить свой статус в очереди"""
     permission_classes = (permissions.IsAuthenticated,)
     authentication_classes = (TokenAuthentication, SessionAuthentication)
@@ -49,7 +50,12 @@ class GetInVisit(views.APIView):
             return Response(content)
 
         # Узнаем номер последнего в очереди
-        queues_last_number = Queue.objects.filter(visit=visit_id).order_by('-number')[0].number
+        queues_last_number = Queue.objects.filter(visit=visit_id).order_by('-number').first()
+        if queues_last_number:
+            queues_last_number = queues_last_number.number
+        # Проверяем, что в очереди кто-то вообще есть
+        else:
+            queues_last_number = 0
         # Встаем за ним
         queues_last_number += 1
         queue = Queue(student=student, visit=visit, number=queues_last_number)
@@ -110,7 +116,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     # - изменения только своего профиля
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class TeacherViewSet(viewsets.ModelViewSet):
@@ -119,7 +125,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
     # - изменения только своего профиля
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
-    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -146,7 +152,8 @@ class VisitViewSet(viewsets.ModelViewSet):
     # - изменения своих мероприятий
     queryset = Visit.objects.all()
     serializer_class = VisitSerializer
-    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
+
 
 
 class QueueViewSet(viewsets.ModelViewSet):

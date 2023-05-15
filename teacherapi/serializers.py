@@ -7,7 +7,7 @@ from teacherapi.models import Student, Teacher, Category, Subscription, Visit, Q
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username','password', 'email', 'groups', 'is_superuser', 'is_staff', 'pk']
+        fields = ['url', 'username', 'password', 'email', 'groups', 'is_superuser', 'is_staff', 'pk']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -19,13 +19,13 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Student
-        fields = ['url', 'first_name', 'last_name', 'middle_name', 'education_group', 'year_of_university']
+        fields = ['url', 'user', 'first_name', 'last_name', 'middle_name', 'education_group', 'year_of_university']
 
 
 class TeacherSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Teacher
-        fields = ['url', 'first_name', 'last_name', 'middle_name', 'department', 'faculty', 'grade']
+        fields = ['url', 'user', 'first_name', 'last_name', 'middle_name', 'department', 'faculty', 'grade']
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
