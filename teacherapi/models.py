@@ -23,17 +23,31 @@ class Student(BaseModel):
         return f'{self.first_name} {self.last_name} {self.middle_name} {self.education_group} {self.year_of_university}'
 
 
+class Faculty(BaseModel):
+    name = models.CharField(max_length=120, blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class Department(BaseModel):
+    name = models.CharField(max_length=120, blank=False, null=False)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.name} {self.faculty}'
+
+
 class Teacher(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     middle_name = models.CharField(max_length=30, blank=True)
-    department = models.CharField(max_length=120, blank=True)
-    faculty = models.CharField(max_length=120, blank=True)
+    department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.SET_NULL)
     grade = models.CharField(max_length=120, blank=True)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} {self.middle_name} {self.grade} {self.department} {self.faculty}'
+        return f'{self.first_name} {self.last_name} {self.middle_name} {self.grade} {self.department}'
 
 
 class Category(BaseModel):
@@ -56,13 +70,14 @@ class Subscription(BaseModel):
 
 
 class Visit(BaseModel):
-    datetime = models.DateTimeField()
+    datetime_start = models.DateTimeField()
+    datetime_end = models.DateTimeField()
     office = models.CharField(max_length=30)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category, blank=True)  # Возможно не должно быть пустым
 
     def __str__(self):
-        return f'{self.teacher} {self.office} {self.datetime}'
+        return f'Аудитория {self.office} занята с {self.datetime_start} по  {self.datetime_end}. Преподаватель:{self.teacher}'
 
 
 class Queue(BaseModel):

@@ -29,12 +29,14 @@ router.register(r'categorys', views.CategoryViewSet)
 router.register(r'subscriptions', views.SubscriptionViewSet)
 router.register(r'visits', views.VisitViewSet)
 router.register(r'queues', views.QueueViewSet)
+router.register(r'department', views.DepartmentViewSet)
+router.register(r'faculty', views.FacultyViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
-    path('api/update-queue-status/', views.UpdateQueueStatus.as_view()),
+    path('api/create-visit/', views.CreateVisit.as_view()),
     path('api/get-in-visit/', views.GetInVisit.as_view()),
     path('api/create-user/', views.CreateUser.as_view()),
     path('api/token/', obtain_auth_token),

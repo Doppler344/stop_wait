@@ -1,52 +1,66 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from teacherapi.models import Student, Teacher, Category, Subscription, Visit, Queue
+from teacherapi.models import Student, Teacher, Category, Subscription, Visit, Queue, Department, Faculty
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class FacultySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Faculty
+        fields = ['pk', 'url', 'name']
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    # faculty = FacultySerializer()
+    class Meta:
+        model = Department
+        fields = ['pk', 'url', 'name', 'faculty']
+
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'password', 'email', 'groups', 'is_superuser', 'is_staff', 'pk']
+        fields = ['pk', 'url', 'username', 'password', 'email', 'groups', 'is_superuser', 'is_staff']
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['url', 'name']
+        fields = ['pk', 'url', 'name']
 
 
-class StudentSerializer(serializers.HyperlinkedModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['url', 'user', 'first_name', 'last_name', 'middle_name', 'education_group', 'year_of_university']
+        fields = ['pk', 'url', 'user', 'first_name', 'last_name', 'middle_name', 'education_group',
+                  'year_of_university']
 
 
-class TeacherSerializer(serializers.HyperlinkedModelSerializer):
+class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
-        fields = ['url', 'user', 'first_name', 'last_name', 'middle_name', 'department', 'faculty', 'grade']
+        fields = ['pk', 'url', 'user', 'first_name', 'last_name', 'middle_name', 'department', 'grade']
 
 
-class CategorySerializer(serializers.HyperlinkedModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['url', 'name', 'student']
+        fields = ['pk', 'url', 'name', 'student']
 
 
-class SubscriptionSerializer(serializers.HyperlinkedModelSerializer):
+class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
-        fields = ['url', 'student', 'teacher']
+        fields = ['pk', 'url', 'student', 'teacher']
 
 
-class VisitSerializer(serializers.HyperlinkedModelSerializer):
+class VisitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Visit
-        fields = ['url', 'teacher', 'office', 'datetime']
+        fields = ['pk',  'teacher', 'office', 'datetime_start', 'datetime_end']
 
 
-class QueueSerializer(serializers.HyperlinkedModelSerializer):
+class QueueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Queue
-        fields = ['url', 'student', 'visit', 'number', 'status']
+        fields = ['pk', 'url', 'student', 'visit', 'number', 'status']

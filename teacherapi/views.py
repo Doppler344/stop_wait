@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from rest_framework import views
 from rest_framework import viewsets
@@ -11,22 +12,51 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 
 from teacherapi.serializers import (UserSerializer, GroupSerializer, StudentSerializer, TeacherSerializer,
-                                    CategorySerializer, SubscriptionSerializer, VisitSerializer, QueueSerializer)
+                                    CategorySerializer, SubscriptionSerializer, VisitSerializer, QueueSerializer,
+                                    DepartmentSerializer, FacultySerializer)
 
-from teacherapi.models import Student, Teacher, Category, Subscription, Visit, Queue
-from teacherapi.validation import validate_username
+from teacherapi.models import Student, Teacher, Category, Subscription, Visit, Queue, Department, Faculty
+from teacherapi.validation import (validate_username, validate_datetime_start_end, validate_datetime_overlapping,
+                                   validate_flag_zero_one)
 
 
-class UpdateQueueStatus(views.APIView):
-    # Эта штука же есть уже в rest
-    """Обновить свой статус в очереди"""
+class CreateVisit(views.APIView):
+    """Создать прием"""
     permission_classes = (permissions.IsAuthenticated,)
     authentication_classes = (TokenAuthentication, SessionAuthentication)
 
     def post(self, request: Request):
         content = {'message': request.user.username,
                    'data': request.data}
+
+        try:
+            validate_datetime_start_end(request.data["datetime_start"], request.data["datetime_end"])
+            validate_flag_zero_one(request.data["forced"])
+        except ValidationError as error:
+            content = {'message': error.messages,
+                       'data': request.data}
+            return Response(content)
+
+        # проверка на занятость аудитории
+        if not request.data["forced"]:
+            try:
+                validate_datetime_overlapping(request.data["datetime_start"], request.data["datetime_end"],
+                                              request.data["office"])
+            except ValidationError as error:
+                content = {'message': error.messages,
+                           'data': request.data}
+                return Response(content)
+
+        user = request.user
+        teacher = Teacher.objects.get(user=user)
+
+        visit = Visit(teacher=teacher, office=request.data["office"], datetime_start=request.data["datetime_start"],
+                      datetime_end=request.data["datetime_end"])
+        visit.save()
+        content = {'message': "success",
+                   'data': VisitSerializer(visit, context={'request': request}).data}
         return Response(content)
+
 
 
 class GetInVisit(views.APIView):
@@ -155,8 +185,19 @@ class VisitViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-
 class QueueViewSet(viewsets.ModelViewSet):
     queryset = Queue.objects.all()
     serializer_class = QueueSerializer
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+
+
+class DepartmentViewSet(viewsets.ModelViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+    permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+
+
+class FacultyViewSet(viewsets.ModelViewSet):
+    queryset = Faculty.objects.all()
+    serializer_class = FacultySerializer
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
